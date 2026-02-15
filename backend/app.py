@@ -5,7 +5,6 @@ from extensions import init_extensions
 from api import register_routes
 import models
 
-# เพิ่มสองบรรทัดนี้
 from sqlalchemy import text
 from extensions import db
 
