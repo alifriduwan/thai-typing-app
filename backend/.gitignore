@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# virtual env
+.venv/
+venv/
+env/
+
+# instance
+instance/
+
+# environment
+.env
+
+# logs
+*.log
