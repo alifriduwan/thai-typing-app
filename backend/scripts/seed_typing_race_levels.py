@@ -1,13 +1,3 @@
-import os, sys
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT))
-
-from dotenv import load_dotenv
-load_dotenv(ROOT / ".env")
-
-from app import create_app
 from extensions import db
 from models import TypingRaceLevel
 
@@ -17,22 +7,29 @@ BASE_TEXTS = [
     "ปรัชญาเศรษฐกิจพอเพียงเป็นรากฐานของชีวิต ซึ่งสร้างความพอประมาณ สมดุล และภูมิคุ้มกันตนเอง",
 ]
 
+# เตรียมข้อมูล
 DATA = []
 for i in range(1, 51):
     text = BASE_TEXTS[(i - 1) % len(BASE_TEXTS)]
-    bot_wpm = 30 + (i - 1) * 2 
-    DATA.append({"level": i, "text": text, "bot_wpm": bot_wpm})
+    bot_wpm = 30 + (i - 1) * 2
+    DATA.append({
+        "level": i,
+        "text": text,
+        "bot_wpm": bot_wpm,
+        "is_active": True
+    })
 
-app = create_app()
-with app.app_context():
+
+def run():
+    # กัน seed ซ้ำ
+    if TypingRaceLevel.query.first():
+        print("Typing race levels already seeded")
+        return
+
+    inserted = 0
     for d in DATA:
-        row = TypingRaceLevel.query.filter_by(level=d["level"]).first()
-        if row:
-            row.text = d["text"]
-            row.bot_wpm = d["bot_wpm"]
-            row.is_active = True
-        else:
-            db.session.add(TypingRaceLevel(**d))
+        db.session.add(TypingRaceLevel(**d))
+        inserted += 1
+
     db.session.commit()
-    total = TypingRaceLevel.query.count()
-    print(f"Seeded/updated {len(DATA)} typing race levels. Total rows now = {total}.")
+    print(f"Seeded typing race levels: {inserted}")

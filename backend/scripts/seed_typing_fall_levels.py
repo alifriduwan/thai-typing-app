@@ -1,14 +1,4 @@
-import os, sys
-from pathlib import Path
 import random
-
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT))
-
-from dotenv import load_dotenv
-load_dotenv(ROOT / ".env")
-
-from app import create_app
 from extensions import db
 from models import TypingFallLevel
 
@@ -16,14 +6,17 @@ EASY_WORDS = [
     "แมว","หมา","บ้าน","น้ำ","ไฟ","ปลา","ข้าว","มือ","ตา","ปาก",
     "ดิน","ฟ้า","ดาว","ไม้","รถ","โต๊ะ","เก้าอี้","หนังสือ","ปากกา","ยางลบ"
 ]
+
 MEDIUM_WORDS = [
     "เรียนรู้","ความรัก","ธรรมชาติ","ความสุข","ความฝัน","วันหยุด","ครอบครัว",
     "สถานี","รถไฟฟ้า","ตลาดนัด","กิจกรรม","อารมณ์","ภูเขา","ชายหาด","สำนักข่าว"
 ]
+
 HARD_WORDS = [
     "ปรากฏการณ์","ทรัพยากร","วินิจฉัย","ศรัทธา","อนุญาต","อัศจรรย์","อัธยาศัย",
     "สังเกต","บูรณาการ","เทคโนโลยี","พหุวัฒนธรรม","ปรัชญา","เศรษฐกิจพอเพียง","จิตวิทยา"
 ]
+
 
 def build_word_pool(level: int):
     if level <= 10:
@@ -34,6 +27,7 @@ def build_word_pool(level: int):
         pool = MEDIUM_WORDS + HARD_WORDS * 4
     random.shuffle(pool)
     return pool
+
 
 def params_for_level(level: int):
     fall_speed = 8.0 - (level - 1) * (5.0 / 29.0)
@@ -48,6 +42,8 @@ def params_for_level(level: int):
         "target_words": int(round(target_words)),
     }
 
+
+# เตรียมข้อมูล
 DATA = []
 for lv in range(1, 31):
     p = params_for_level(lv)
@@ -62,23 +58,17 @@ for lv in range(1, 31):
         "is_active": True,
     })
 
-app = create_app()
-with app.app_context():
-    print("DB URL =", db.engine.url)
-    inserted, updated = 0, 0
+
+def run():
+    # กัน seed ซ้ำ
+    if TypingFallLevel.query.first():
+        print("Typing fall levels already seeded")
+        return
+
+    inserted = 0
     for d in DATA:
-        row = TypingFallLevel.query.filter_by(level=d["level"]).first()
-        if row:
-            row.fall_speed        = d["fall_speed"]
-            row.spawn_interval_ms = d["spawn_interval_ms"]
-            row.max_concurrent    = d["max_concurrent"]
-            row.target_words      = d["target_words"]
-            row.word_pool         = d["word_pool"]
-            row.is_active         = d["is_active"]
-            updated += 1
-        else:
-            db.session.add(TypingFallLevel(**d))
-            inserted += 1
+        db.session.add(TypingFallLevel(**d))
+        inserted += 1
+
     db.session.commit()
-    total = TypingFallLevel.query.count()
-    print(f"Seeded/updated {len(DATA)} levels. inserted={inserted}, updated={updated}. Total rows now = {total}.")
+    print(f"Seeded typing fall levels: {inserted}")

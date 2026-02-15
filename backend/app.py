@@ -9,7 +9,10 @@ from sqlalchemy import text
 from extensions import db
 
 from scripts.seed_spelling_levels import run as seed_spelling
-
+from scripts.seed_typing_fall_levels import run as seed_fall
+from scripts.seed_typing_race_levels import run as seed_race
+from scripts.seed_typing_texts import run as seed_typing_texts
+from scripts.seed_typing import run as seed_typing
 
 load_dotenv()
 
@@ -22,6 +25,10 @@ def create_app():
     with app.app_context():
         db.create_all()
         seed_spelling()
+        seed_fall()
+        seed_race()
+        seed_typing_texts()
+        seed_typing()
 
     @app.get("/")
     def index():

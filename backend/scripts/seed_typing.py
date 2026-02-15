@@ -1,13 +1,3 @@
-import os, sys
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT))
-
-from dotenv import load_dotenv
-load_dotenv(ROOT / ".env")
-
-from app import create_app
 from extensions import db
 from models import TypingLesson, TypingLevel
 
@@ -55,7 +45,7 @@ DATA = [
             {"index": 3, "raw": make_raw_pair("ก", "า"), "display": make_display_chars("กา"), "has_hand": False},
         ],
     },
-    {
+        {
         "lesson_number": 3,
         "title": "บทเรียน 3: ห, ส, หส",
         "levels": [
@@ -64,7 +54,7 @@ DATA = [
             {"index": 3, "raw": make_raw_pair("ห", "ส"), "display": make_display_chars("หส"), "has_hand": False},
         ],
     },
-    {
+        {
         "lesson_number": 4,
         "title": "บทเรียน 4: ฟ, ว, ฟว",
         "levels": [
@@ -447,15 +437,15 @@ DATA = [
 ]
 
 
-app = create_app()
+def run():
+    # กัน seed ซ้ำ
+    if TypingLesson.query.first():
+        print("Typing lessons already seeded")
+        return
 
-with app.app_context():
-    print("=== RESET DB ===")
-    db.drop_all()
-    db.create_all()
-
-    print("=== INSERT DATA ===")
     global_idx = 1
+    lesson_count = 0
+    level_count = 0
 
     for lesson_data in DATA:
         lesson = TypingLesson(
@@ -464,6 +454,8 @@ with app.app_context():
         )
         db.session.add(lesson)
         db.session.flush()
+
+        lesson_count += 1
 
         for lv in lesson_data["levels"]:
             row = TypingLevel(
@@ -476,9 +468,8 @@ with app.app_context():
             )
             db.session.add(row)
             global_idx += 1
+            level_count += 1
 
     db.session.commit()
 
-    print("=====================================")
-    print(f"Done! Lessons={TypingLesson.query.count()}, Levels={TypingLevel.query.count()}")
-    print("=====================================")
+    print(f"Seeded typing lessons: {lesson_count}, levels: {level_count}")
