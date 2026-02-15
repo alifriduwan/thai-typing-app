@@ -1,4 +1,3 @@
-from app import create_app
 from extensions import db
 from models import SpellingLevel
 
@@ -56,19 +55,16 @@ DATA = [
 ]
 
 def run():
-    app = create_app()
-    with app.app_context():
-        # กัน seed ซ้ำ: ถ้ามีข้อมูลแล้วให้หยุด
-        if SpellingLevel.query.first():
-            print("Spelling levels already seeded")
-            return
+    # กัน seed ซ้ำ
+    if SpellingLevel.query.first():
+        print("Spelling levels already seeded")
+        return
 
-        for d in DATA:
-            db.session.add(SpellingLevel(**d))
+    for d in DATA:
+        db.session.add(SpellingLevel(**d))
 
-        db.session.commit()
-        total = SpellingLevel.query.count()
-        print(f"Seeded {len(DATA)} spelling levels. Total rows = {total}")
+    db.session.commit()
+    print("Seeded spelling levels")
 
 
 if __name__ == "__main__":
