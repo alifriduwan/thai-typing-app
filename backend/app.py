@@ -16,6 +16,9 @@ def create_app():
     init_extensions(app)
     register_routes(app)
 
+    with app.app_context():
+        db.create_all()
+
     @app.get("/")
     def index():
         return "Flask is running. Try /api/health"
