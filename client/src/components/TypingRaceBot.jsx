@@ -8,6 +8,8 @@ import {
 } from "../lib/typingRaceGuestProgress";
 
 const TypingRaceBot = ({ onNextLevel, minAccuracy = 90 }) => {
+  const API_BASE = import.meta.env.VITE_API_URL || "";
+
   const { levelId } = useParams();
   const [currentLevel, setCurrentLevel] = useState(Number(levelId) || 1);
 
@@ -55,7 +57,10 @@ const TypingRaceBot = ({ onNextLevel, minAccuracy = 90 }) => {
       setLoading(true);
       setErr("");
       try {
-        const res = await fetch(`/api/typing-race/level/${currentLevel}`);
+        const res = await fetch(
+          `${API_BASE}/api/typing-race/level/${currentLevel}`,
+        );
+
         if (!res.ok) throw new Error("โหลดข้อมูลด่านไม่สำเร็จ");
         const data = await res.json();
         setTargetText(data.text || "");
@@ -155,7 +160,7 @@ const TypingRaceBot = ({ onNextLevel, minAccuracy = 90 }) => {
       const token = localStorage.getItem("access_token");
       if (token) {
         try {
-          await fetch("/api/typing-race/complete", {
+          await fetch(`${API_BASE}/api/typing-race/complete`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

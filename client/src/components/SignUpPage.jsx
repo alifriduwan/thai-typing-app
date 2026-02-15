@@ -5,6 +5,8 @@ import logo from "../assets/logo-3.png";
 import { Eye, EyeOff } from "lucide-react";
 
 const SignUpPage = () => {
+  const API_BASE = import.meta.env.VITE_API_URL;
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,7 +39,7 @@ const SignUpPage = () => {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/signup", {
+      const res = await fetch(`${API_BASE}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: u, email: em, password }),

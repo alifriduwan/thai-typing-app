@@ -67,6 +67,8 @@ const GAME_TITLES = {
 };
 
 const LevelSelect = () => {
+  const API_BASE = import.meta.env.VITE_API_URL;
+
   const { gameId } = useParams();
   const gameTitle = GAME_TITLES[gameId] || "เลือกด่าน";
 
@@ -84,7 +86,8 @@ const LevelSelect = () => {
       try {
         let list = [];
         if (gameId === "spelling-quiz") {
-          const resLevels = await fetch("/api/spelling/levels");
+          const resLevels = await fetch(`${API_BASE}/api/spelling/levels`);
+
           if (!resLevels.ok) throw new Error("โหลดรายการด่านไม่สำเร็จ");
           list = await resLevels.json();
         } else {
@@ -101,7 +104,7 @@ const LevelSelect = () => {
           const token = localStorage.getItem("access_token");
 
           if (token) {
-            let resState = await fetch("/api/spelling/state", {
+            let resState = await fetch(`${API_BASE}/api/spelling/state`, {
               headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -155,7 +158,7 @@ const LevelSelect = () => {
       window.removeEventListener("spelling:progress", onGuestProgress);
       window.removeEventListener("auth:changed", onAuthChanged);
     };
-  }, [gameId]);
+  }, [API_BASE, gameId]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-4">

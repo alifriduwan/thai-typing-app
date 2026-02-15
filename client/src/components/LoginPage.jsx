@@ -5,6 +5,8 @@ import logo from "../assets/logo-3.png";
 import { NavLink } from "react-router-dom";
 
 const LoginPage = () => {
+  const API_BASE = import.meta.env.VITE_API_URL;
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,7 +22,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),

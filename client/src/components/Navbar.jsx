@@ -54,6 +54,7 @@ const Navbar = () => {
   const doLogout = () => {
     setOpenMenu(false);
     clearToken();
+    window.dispatchEvent(new Event("auth:changed"));
     navigate("/", { replace: true });
   };
 

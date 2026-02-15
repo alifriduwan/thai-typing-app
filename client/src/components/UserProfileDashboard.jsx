@@ -28,6 +28,8 @@ const StatCard = ({ icon, value, label, sub, color }) => {
 };
 
 const UserProfileDashboard = () => {
+  const API_BASE = import.meta.env.VITE_API_URL;
+
   const [avgSpeed, setAvgSpeed] = useState(0);
   const [avgAccuracy, setAvgAccuracy] = useState(0);
   const [history, setHistory] = useState([]);
@@ -46,9 +48,12 @@ const UserProfileDashboard = () => {
 
     const fetchSummary = async () => {
       try {
-        const res = await fetch("/api/typing_test/me/summary?days=7", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          `${API_BASE}/api/typing_test/me/summary?days=7`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data?.error || "โหลดข้อมูลไม่สำเร็จ");
 
@@ -74,7 +79,7 @@ const UserProfileDashboard = () => {
 
     const fetchLessonProgress = async () => {
       try {
-        const res = await fetch("/api/typing/state", {
+        const res = await fetch(`${API_BASE}/api/typing/state`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -91,7 +96,7 @@ const UserProfileDashboard = () => {
     Promise.all([fetchSummary(), fetchLessonProgress()]).finally(() =>
       setLoading(false),
     );
-  }, []);
+  }, [API_BASE]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">

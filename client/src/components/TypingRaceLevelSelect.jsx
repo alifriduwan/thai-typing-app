@@ -65,6 +65,8 @@ const LevelItem = ({ levelName, status, levelId, botWpm }) => {
 };
 
 const TypingRaceLevelSelect = () => {
+  const API_BASE = import.meta.env.VITE_API_URL || "";
+
   const [levels, setLevels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
@@ -77,7 +79,8 @@ const TypingRaceLevelSelect = () => {
       setErr("");
 
       try {
-        const resLevels = await fetch("/api/typing-race/levels");
+        const resLevels = await fetch(`${API_BASE}/api/typing-race/levels`);
+
         if (!resLevels.ok) throw new Error("โหลดรายการด่านไม่สำเร็จ");
         const list = await resLevels.json();
 
@@ -86,7 +89,7 @@ const TypingRaceLevelSelect = () => {
 
         if (token) {
           try {
-            const resState = await fetch("/api/typing-race/state", {
+            const resState = await fetch(`${API_BASE}/api/typing-race/state`, {
               headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -130,7 +133,7 @@ const TypingRaceLevelSelect = () => {
       abort = true;
       window.removeEventListener("typingrace:progress", onGuestProgress);
     };
-  }, []);
+  }, [API_BASE]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-4">

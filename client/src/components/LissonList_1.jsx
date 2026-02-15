@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Lock, Star } from "lucide-react";
 import { loadGuestTypingProgress } from "../lib/guestProgressTyping";
 
-const API_BASE = "http://localhost:5000/api/typing";
+// const API_BASE = "http://localhost:5000/api/typing";
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/typing`;
 
 const LessonList_1 = () => {
   const navigate = useNavigate();
@@ -97,7 +98,7 @@ const LessonList_1 = () => {
       setLessons(data);
     };
     fetchLessons();
-  }, []);
+  }, [API_BASE]);
 
   useEffect(() => {
     if (lessonId) setActiveLesson(parseInt(lessonId, 10));

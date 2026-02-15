@@ -19,6 +19,8 @@ function getOptionClasses(option, isSubmitted, correctWord) {
 }
 
 const SpellingQuiz = () => {
+  const API_BASE = import.meta.env.VITE_API_URL;
+
   const { levelId } = useParams();
   const navigate = useNavigate();
 
@@ -67,7 +69,7 @@ const SpellingQuiz = () => {
       setLoadingState(true);
       try {
         if (isLoggedIn) {
-          const res = await fetch("/api/spelling/state", {
+          const res = await fetch(`${API_BASE}/api/spelling/state`, {
             headers: { Authorization: `Bearer ${token}` },
           });
 
@@ -88,7 +90,7 @@ const SpellingQuiz = () => {
     };
 
     fetchState();
-  }, [isLoggedIn, token]);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     if (!loadingState && level > allowedNext) {
@@ -104,11 +106,13 @@ const SpellingQuiz = () => {
 
       try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        let res = await fetch(`/api/spelling/level/${level}`, { headers });
+        let res = await fetch(`${API_BASE}/api/spelling/level/${level}`, {
+          headers,
+        });
 
         if (res.status === 401) {
           localStorage.removeItem("access_token");
-          res = await fetch(`/api/spelling/level/${level}`);
+          res = await fetch(`${API_BASE}/api/spelling/level/${level}`);
         }
 
         if (!res.ok) throw new Error();
@@ -161,7 +165,7 @@ const SpellingQuiz = () => {
     const next = level + 1;
 
     if (isLoggedIn) {
-      await fetch("/api/spelling/complete", {
+      await fetch(`${API_BASE}/api/spelling/complete`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -34,6 +34,8 @@ const wordWrapText = (text, maxCharsPerLine) => {
 };
 
 const TypingChallenge = () => {
+  const API_BASE = import.meta.env.VITE_API_URL;
+
   const { level: paramLevel, time: paramTime } = useParams();
   const level = (paramLevel || "medium").toLowerCase();
   const time = parseInt(paramTime, 10) || 60;
@@ -111,10 +113,9 @@ const TypingChallenge = () => {
 
     try {
       const res = await fetch(
-        `/api/typing_text/random?level=${encodeURIComponent(
-          level,
-        )}&time=${time}`,
+        `${API_BASE}/api/typing_text/random?level=${encodeURIComponent(level)}&time=${time}`,
       );
+
       const data = await res.json();
 
       if (!res.ok || !data?.text) throw new Error(data?.error || "ไม่พบบทความ");
@@ -197,7 +198,7 @@ const TypingChallenge = () => {
 
     const token = localStorage.getItem("access_token");
     if (token) {
-      fetch("/api/typing_test/submit", {
+      fetch(`${API_BASE}/api/typing_test/submit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

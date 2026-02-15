@@ -6,6 +6,8 @@ import { saveGuestProgressFall } from "../lib/guestProgressFall";
 const DEFAULT_TIME_LIMIT = 30;
 
 const TypingFallGame = () => {
+  const API_BASE = import.meta.env.VITE_API_URL;
+
   const { levelId } = useParams();
   const navigate = useNavigate();
   const level = Math.max(1, parseInt(levelId || "1", 10));
@@ -71,7 +73,9 @@ const TypingFallGame = () => {
       try {
         const headers = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
-        const r = await fetch(`/api/typing_fall/level/${level}`, { headers });
+        const r = await fetch(`${API_BASE}/api/typing_fall/level/${level}`, {
+          headers,
+        });
 
         if (r.status === 403) {
           const j = await r.json().catch(() => ({}));
@@ -124,7 +128,7 @@ const TypingFallGame = () => {
     return () => {
       aborted = true;
     };
-  }, [level, token, navigate]);
+  }, [API_BASE, level, token, navigate]);
 
   const spawnNewWord = (pool) => {
     const list = pool && pool.length ? pool : config.word_pool;
@@ -190,7 +194,7 @@ const TypingFallGame = () => {
 
       try {
         if (isLoggedIn) {
-          const res = await fetch("/api/typing_fall/complete", {
+          const res = await fetch(`${API_BASE}/api/typing_fall/complete`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

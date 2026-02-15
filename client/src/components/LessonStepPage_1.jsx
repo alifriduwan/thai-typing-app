@@ -6,7 +6,8 @@ import ThaiKeyboardLayout from "./ThaiKeyboardLayout";
 import { getHandPosition } from "../config/handPositions";
 import { saveGuestTypingProgress } from "../lib/guestProgressTyping";
 
-const API_BASE = "http://localhost:5000/api/typing";
+// const API_BASE = "http://localhost:5000/api/typing";
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/typing`;
 
 const LessonStepPage_1 = () => {
   const { lessonId, stepIndex } = useParams();
@@ -95,7 +96,7 @@ const LessonStepPage_1 = () => {
     };
 
     loadLevel();
-  }, [lessonId, stepIndex, navigate]);
+  }, [lessonId, stepIndex, navigate, API_BASE]);
 
   const images =
     hasHands && stepIndex !== "3"
