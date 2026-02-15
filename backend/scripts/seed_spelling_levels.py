@@ -1,13 +1,3 @@
-
-import os, sys
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.append(str(ROOT))
-
-from dotenv import load_dotenv
-load_dotenv(ROOT / ".env")
-
 from app import create_app
 from extensions import db
 from models import SpellingLevel
@@ -65,17 +55,21 @@ DATA = [
     {"level": 50, "correct_word": "กิจกรรม",        "options": ["กิจกรรม", "กิจกรรมณ์"]},
 ]
 
-app = create_app()
-with app.app_context():
-    print("DB URL =", db.engine.url)
-    for d in DATA:
-        row = SpellingLevel.query.filter_by(level=d["level"]).first()
-        if row:
-            row.correct_word = d["correct_word"]
-            row.options = d["options"]
-            row.is_active = True
-        else:
+def run():
+    app = create_app()
+    with app.app_context():
+        # กัน seed ซ้ำ: ถ้ามีข้อมูลแล้วให้หยุด
+        if SpellingLevel.query.first():
+            print("Spelling levels already seeded")
+            return
+
+        for d in DATA:
             db.session.add(SpellingLevel(**d))
-    db.session.commit()
-    total = SpellingLevel.query.count()
-    print(f"Seeded/updated {len(DATA)} levels. Total rows now = {total}.")
+
+        db.session.commit()
+        total = SpellingLevel.query.count()
+        print(f"Seeded {len(DATA)} spelling levels. Total rows = {total}")
+
+
+if __name__ == "__main__":
+    run()

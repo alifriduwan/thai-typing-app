@@ -8,6 +8,9 @@ import models
 from sqlalchemy import text
 from extensions import db
 
+from scripts.seed_spelling_levels import run as seed_spelling
+
+
 load_dotenv()
 
 def create_app():
@@ -18,6 +21,7 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        seed_spelling()
 
     @app.get("/")
     def index():
