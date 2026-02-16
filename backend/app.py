@@ -33,6 +33,10 @@ def create_app():
     @app.get("/")
     def index():
         return "Flask is running. Try /api/health"
+    
+    @app.get("/health")
+    def health():
+        return {"status": "ok"}
 
     @app.get("/api/db/health")
     def db_health():
