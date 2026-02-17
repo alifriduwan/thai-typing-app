@@ -64,28 +64,6 @@ def list_users():
         for u in users
     ])
 
-@bp.post("/forgot-password")
-def forgot_password():
-    data = request.get_json() or {}
-    email = (data.get("email") or "").strip()
-
-    if not email:
-        return jsonify({"error": "email required"}), 400
-
-    user = User.query.filter_by(email=email).first()
-
-    # ไม่บอกว่า email มีหรือไม่มี (security)
-    if user:
-        token = secrets.token_urlsafe(32)
-        user.reset_token = token
-        user.reset_token_expire = datetime.utcnow() + timedelta(minutes=30)
-        db.session.commit()
-
-        reset_link = f"{current_app.config['FRONTEND_URL']}/reset-password/{token}"
-        send_reset_email(user.email, reset_link)
-
-    return {"ok": True}
-
 
 @bp.post("/forgot-password")
 def forgot_password():
