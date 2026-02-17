@@ -9,6 +9,9 @@ class User(db.Model):
     email         = db.Column(db.String(120), unique=True, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
+    reset_token = db.Column(db.String(255), nullable=True)
+    reset_token_expire = db.Column(db.DateTime, nullable=True)
+
 
     def set_password(self, raw): self.password_hash = generate_password_hash(raw)
     def check_password(self, raw): return check_password_hash(self.password_hash, raw)
