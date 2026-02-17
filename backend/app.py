@@ -21,6 +21,7 @@ def create_app():
     app.config.from_object(Config)
     init_extensions(app)
     register_routes(app)
+    print("MAIL:", app.config.get("MAIL_USERNAME"))
 
     with app.app_context():
         db.create_all()
