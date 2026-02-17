@@ -18,6 +18,9 @@ import TypingRaceLevelSelect from "../components/TypingRaceLevelSelect";
 import TypingFallLevelSelect from "../components/TypingFallLevelSelect";
 import LessonList_1 from "../components/LissonList_1";
 import LessonStepPage_1 from "../components/LessonStepPage_1";
+import ForgotPasswordPage from "../components/ForgotPasswordPage";
+import ForgotPasswordSuccess from "../components/ForgotPasswordSuccess";
+import ResetPasswordPage from "../components/ResetPasswordPage";
 
 const AppRouter = () => {
   return (
@@ -66,6 +69,12 @@ const AppRouter = () => {
 
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route
+          path="/forgot-password/success"
+          element={<ForgotPasswordSuccess />}
+        />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
     </BrowserRouter>
