@@ -66,7 +66,7 @@ def test_email():
     from utils.email_service import send_reset_email
 
     send_reset_email(
-        to_email="abdulfeera2@gmail.com",
+        to_email="alifriduwan.auma@gmail.com",
         reset_link="https://thai-typing-app.vercel.app/reset-password/test-token"
     )
 
