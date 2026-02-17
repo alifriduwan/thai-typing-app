@@ -27,18 +27,35 @@ const ForgotPasswordSuccess = () => {
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold text-gray-800 mb-3">ขอบคุณ!</h2>
+          {/* Title */}
+          <h2 className="text-3xl font-bold text-gray-800 mb-3">
+            ตรวจสอบอีเมลของคุณ
+          </h2>
 
+          {/* Message (Security Best Practice) */}
           <p className="text-gray-600 mb-6">
-            กรุณาตรวจสอบอีเมลของคุณเพื่อรีเซ็ตรหัสผ่าน
+            หากมีบัญชีที่ใช้อีเมลนี้ ระบบจะส่งลิงก์สำหรับรีเซ็ตรหัสผ่านให้
+            กรุณาตรวจสอบกล่องจดหมายหรือโฟลเดอร์ Spam ของคุณ
           </p>
 
-          <Link
-            to="/login"
-            className="inline-block bg-[#2B8BE6] hover:bg-[#2478C9] text-white px-6 py-3 rounded-lg font-semibold transition"
-          >
-            กลับไปเข้าสู่ระบบ
-          </Link>
+          {/* Actions */}
+          <div className="flex flex-col items-center gap-4">
+            {/* Back to Login */}
+            <Link
+              to="/login"
+              className="inline-block bg-[#2B8BE6] hover:bg-[#2478C9] text-white px-6 py-3 rounded-lg font-semibold transition"
+            >
+              กลับไปเข้าสู่ระบบ
+            </Link>
+
+            {/* Resend */}
+            <Link
+              to="/forgot-password"
+              className="text-sm text-[#2B8BE6] hover:underline"
+            >
+              ไม่ได้รับอีเมล? ส่งอีกครั้ง
+            </Link>
+          </div>
         </div>
       </div>
     </div>

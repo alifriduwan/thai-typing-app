@@ -3,29 +3,49 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/logo-3.png";
 
 const ForgotPasswordPage = () => {
+  const API_BASE = import.meta.env.VITE_API_URL;
+
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    // validate แบบง่าย (frontend only)
-    if (!email.includes("@")) {
+    // validation เบื้องต้น
+    if (!email || !email.includes("@")) {
       setError("กรุณากรอกอีเมลให้ถูกต้อง");
       return;
     }
 
     setLoading(true);
 
-    // จำลองการส่ง request
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data?.error || "ไม่สามารถส่งอีเมลได้");
+      }
+
+      // ไม่ว่าจะมี email หรือไม่ → ไปหน้า success
+      // (ป้องกัน email enumeration)
       navigate("/forgot-password/success", { replace: true });
-    }, 1000);
+    } catch (err) {
+      setError(err.message || "เกิดข้อผิดพลาด กรุณาลองใหม่");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,7 +65,7 @@ const ForgotPasswordPage = () => {
         </span>
       </NavLink>
 
-      {/* ฝั่งซ้าย (เหมือน LoginPage) */}
+      {/* ฝั่งซ้าย */}
       <div className="hidden md:flex md:w-[35%] bg-[#F8F8F8] flex-col justify-center items-center px-12 border-r border-gray-200">
         <img
           src={logo}

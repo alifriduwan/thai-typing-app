@@ -3,7 +3,9 @@ import { useParams, useNavigate, Link, NavLink } from "react-router-dom";
 import logo from "../assets/logo-3.png";
 
 const ResetPasswordPage = () => {
-  const { token } = useParams(); // รับ token จาก URL
+  const API_BASE = import.meta.env.VITE_API_URL;
+
+  const { token } = useParams();
   const navigate = useNavigate();
 
   const [password, setPassword] = useState("");
@@ -11,7 +13,7 @@ const ResetPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -22,21 +24,39 @@ const ResetPasswordPage = () => {
 
     setLoading(true);
 
-    // Frontend only (จำลอง)
-    setTimeout(() => {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token,
+          password,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data?.error || "ลิงก์ไม่ถูกต้องหรือหมดอายุแล้ว");
+      }
+
+      // สำเร็จ → ไปหน้า login
+      navigate("/login", {
+        replace: true,
+        state: { message: "ตั้งรหัสผ่านสำเร็จ กรุณาเข้าสู่ระบบ" },
+      });
+    } catch (err) {
+      setError(err.message || "เกิดข้อผิดพลาด");
+    } finally {
       setLoading(false);
-
-      // ปกติจะส่ง password + token ไป backend
-      console.log("Token:", token);
-      console.log("New password:", password);
-
-      navigate("/login");
-    }, 1000);
+    }
   };
 
   return (
     <div className="min-h-screen flex font-sans bg-gray-100">
-      {/* Logo มุมซ้ายบน */}
+      {/* Logo */}
       <NavLink
         to="/"
         className="fixed top-6 left-8 flex items-center gap-1 z-50"
@@ -47,16 +67,14 @@ const ResetPasswordPage = () => {
         </span>
       </NavLink>
 
-      {/* ฝั่งซ้าย */}
+      {/* Left */}
       <div className="hidden md:flex md:w-[35%] bg-[#F8F8F8] flex-col justify-center items-center px-12 border-r border-gray-200">
         <img src={logo} alt="ThaiTyping" className="w-40 mb-6" />
-
         <h2 className="text-3xl font-bold text-gray-800 mb-4">Welcome back!</h2>
-
         <p className="text-gray-600">ตั้งรหัสผ่านใหม่เพื่อเข้าใช้งาน</p>
       </div>
 
-      {/* ฝั่งขวา */}
+      {/* Right */}
       <div className="flex w-full md:w-[65%] justify-center items-center px-6 bg-white">
         <div className="w-full max-w-md">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
@@ -78,7 +96,6 @@ const ResetPasswordPage = () => {
                   className="w-full p-3 pr-12 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2B8BE6]"
                 />
 
-                {/* ปุ่มโชว์รหัส */}
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}

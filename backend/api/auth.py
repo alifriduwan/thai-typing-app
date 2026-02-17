@@ -1,7 +1,11 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from extensions import db
 from models import User
+from datetime import datetime, timedelta
+import secrets
+from utils.email_service import send_reset_email
+
 
 bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
@@ -60,15 +64,72 @@ def list_users():
         for u in users
     ])
 
+@bp.post("/forgot-password")
+def forgot_password():
+    data = request.get_json() or {}
+    email = (data.get("email") or "").strip()
 
-@bp.get("/test-email")
-def test_email():
-    from utils.email_service import send_reset_email
+    if not email:
+        return jsonify({"error": "email required"}), 400
 
-    send_reset_email(
-        to_email="alifriduwan.auma@gmail.com",
-        reset_link="https://thai-typing-app.vercel.app/reset-password/test-token"
-    )
+    user = User.query.filter_by(email=email).first()
+
+    # ไม่บอกว่า email มีหรือไม่มี (security)
+    if user:
+        token = secrets.token_urlsafe(32)
+        user.reset_token = token
+        user.reset_token_expire = datetime.utcnow() + timedelta(minutes=30)
+        db.session.commit()
+
+        reset_link = f"{current_app.config['FRONTEND_URL']}/reset-password/{token}"
+        send_reset_email(user.email, reset_link)
 
     return {"ok": True}
 
+
+@bp.post("/forgot-password")
+def forgot_password():
+    data = request.get_json() or {}
+    email = (data.get("email") or "").strip()
+
+    if not email:
+        return jsonify({"error": "email required"}), 400
+
+    user = User.query.filter_by(email=email).first()
+
+    # ไม่บอกว่า email มีหรือไม่มี (security)
+    if user:
+        token = secrets.token_urlsafe(32)
+        user.reset_token = token
+        user.reset_token_expire = datetime.utcnow() + timedelta(minutes=30)
+        db.session.commit()
+
+        reset_link = f"{current_app.config['FRONTEND_URL']}/reset-password/{token}"
+        send_reset_email(user.email, reset_link)
+
+    return {"ok": True}
+
+
+@bp.post("/reset-password")
+def reset_password():
+    data = request.get_json() or {}
+    token = (data.get("token") or "").strip()
+    password = (data.get("password") or "").strip()
+
+    if not token or not password:
+        return jsonify({"error": "token and password required"}), 400
+
+    user = User.query.filter_by(reset_token=token).first()
+
+    if not user:
+        return jsonify({"error": "invalid token"}), 400
+
+    if user.reset_token_expire < datetime.utcnow():
+        return jsonify({"error": "token expired"}), 400
+
+    user.set_password(password)
+    user.reset_token = None
+    user.reset_token_expire = None
+    db.session.commit()
+
+    return {"ok": True}
