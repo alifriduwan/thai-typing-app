@@ -59,3 +59,16 @@ def list_users():
         }
         for u in users
     ])
+
+
+@bp.get("/test-email")
+def test_email():
+    from utils.email import send_reset_email
+
+
+    send_reset_email(
+        to_email="abdulfeera2@gmail.com",
+        reset_link="https://example.com/reset-password/test-token"
+    )
+
+    return {"ok": True}
