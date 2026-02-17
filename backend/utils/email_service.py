@@ -24,8 +24,7 @@ def send_reset_email(to_email: str, reset_link: str):
     msg["From"] = current_app.config["MAIL_FROM"]
     msg["To"] = to_email
 
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
-        server.starttls()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(
             current_app.config["MAIL_USERNAME"],
             current_app.config["MAIL_PASSWORD"]
