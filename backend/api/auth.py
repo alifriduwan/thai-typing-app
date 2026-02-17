@@ -63,8 +63,7 @@ def list_users():
 
 @bp.get("/test-email")
 def test_email():
-    from utils.email import send_reset_email
-
+    from backend.utils.email_service import send_reset_email
 
     send_reset_email(
         to_email="abdulfeera2@gmail.com",
