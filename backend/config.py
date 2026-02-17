@@ -17,3 +17,5 @@ class Config:
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
     MAIL_FROM = os.getenv("MAIL_FROM")
     FRONTEND_URL = os.getenv("FRONTEND_URL")
+    SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+
