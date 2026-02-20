@@ -111,14 +111,25 @@ const Navbar = () => {
           <div className="border-l-2 border-white/70 h-6 mx-4 hidden md:block" />
 
           {!isLoggedIn ? (
-            <NavLink
-              to="/login"
-              className={({ isActive }) =>
-                `${linkClasses} ${isActive ? activeLinkClasses : ""}`
-              }
-            >
-              เข้าสู่ระบบ
-            </NavLink>
+            <>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `${linkClasses} ${isActive ? activeLinkClasses : ""}`
+                }
+              >
+                เข้าสู่ระบบ
+              </NavLink>
+              <div className="border-l-2 border-white/70 h-6 mx-4 hidden md:block" />
+              <NavLink
+                to="/signup"
+                className={({ isActive }) =>
+                  `${linkClasses} ${isActive ? activeLinkClasses : ""}`
+                }
+              >
+                สมัครสมาชิก
+              </NavLink>
+            </>
           ) : (
             <div className="relative" ref={menuRef}>
               <button
