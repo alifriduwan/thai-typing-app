@@ -1,5 +1,5 @@
 const KEY = "typing_lesson_guest_progress";
-const TTL_MS = 20 * 60 * 1000;
+const TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 export function loadGuestTypingProgress() {
   try {
