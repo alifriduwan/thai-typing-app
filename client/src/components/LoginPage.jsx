@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, NavLink } from "react-router-dom";
 import { setToken } from "../lib/auth";
 import logo from "../assets/logo-3.png";
-import { NavLink } from "react-router-dom";
 
 const LoginPage = () => {
   const API_BASE = import.meta.env.VITE_API_URL;
@@ -24,23 +23,44 @@ const LoginPage = () => {
     try {
       const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
       });
 
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data?.error || "เข้าสู่ระบบไม่สำเร็จ");
 
-      if (!data?.access_token)
-        throw new Error("ไม่พบ access_token จากเซิร์ฟเวอร์");
+      // debug ดู response จริง
+      console.log("Login response:", data);
 
-      if (data?.username) {
+      if (!res.ok) {
+        throw new Error(data?.error || "เข้าสู่ระบบไม่สำเร็จ");
+      }
+
+      // ตรวจว่ามี token จริง
+      if (!data.access_token) {
+        throw new Error("เซิร์ฟเวอร์ไม่ได้ส่ง access_token กลับมา");
+      }
+
+      // เก็บ token
+      setToken(data.access_token);
+
+      // เก็บ username (ถ้ามี)
+      if (data.username) {
         localStorage.setItem("username", data.username);
       }
 
-      setToken(data.access_token);
+      // ตรวจว่าเก็บสำเร็จจริง
+      console.log("Saved token:", localStorage.getItem("access_token"));
+
+      // ไปหน้าถัดไป
       navigate(redirectTo, { replace: true });
     } catch (err) {
+      console.error(err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -58,16 +78,14 @@ const LoginPage = () => {
           alt="ThaiTyping Logo"
           className="h-12 w-auto object-contain -mr-2"
         />
-        <span className="text-xl text-[#2B8BE6]  font-semibold hidden sm:block">
+        <span className="text-xl text-[#2B8BE6] font-semibold hidden sm:block">
           ThaiTyping
         </span>
       </NavLink>
+
+      {/* Left panel */}
       <div className="hidden md:flex md:w-[35%] bg-[#F8F8F8] flex-col justify-center items-center px-12 border-r border-gray-200">
-        <img
-          src={logo}
-          alt="ThaiTyping"
-          className="w-40 h-auto object-contain mb-6"
-        />
+        <img src={logo} alt="ThaiTyping" className="w-40 mb-6" />
 
         <h2 className="text-3xl font-bold text-gray-800 mb-4">Welcome back!</h2>
 
@@ -85,6 +103,8 @@ const LoginPage = () => {
           </Link>
         </p>
       </div>
+
+      {/* Right panel */}
       <div className="flex w-full md:w-[65%] justify-center items-center px-6 bg-white">
         <div className="w-full max-w-md">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">

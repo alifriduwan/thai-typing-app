@@ -1,9 +1,11 @@
 const KEY = "access_token";
 
-export const getToken = () => localStorage.getItem(KEY);
+export const getToken = () => {
+  return localStorage.getItem(KEY);
+};
 
-export const setToken = (t) => {
-  localStorage.setItem(KEY, t);
+export const setToken = (token) => {
+  localStorage.setItem(KEY, token);
   window.dispatchEvent(new Event("auth:changed"));
 };
 
