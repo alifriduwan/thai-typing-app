@@ -7,7 +7,6 @@ from models import TypingTestSession
 
 bp = Blueprint("typing_test", __name__, url_prefix="/api/typing_test")
 
-
 @bp.post("/submit")
 @jwt_required()
 def submit():
@@ -46,18 +45,13 @@ def submit():
 @jwt_required()
 def my_summary():
     """
-    สรุปผลเฉลี่ยรายวัน (ล่าสุด N วัน) + ค่าเฉลี่ยรวมช่วงนั้น แยกตาม level
+    สรุปผลเฉลี่ยรายวัน (ล่าสุด N วัน) + ค่าเฉลี่ยรวมช่วงนั้น
     Response:
     {
       "avg_speed": 42,
       "avg_accuracy": 95,
       "history": [
-        {
-          "date": "25/07",
-          "level": "easy",
-          "ความเร็ว (wpm)": 35,
-          "ความแม่นยำ (%)": 92
-        },
+        {"date":"25/07","ความเร็ว (wpm)":35,"ความแม่นยำ (%)":92},
         ...
       ]
     }
@@ -69,7 +63,6 @@ def my_summary():
 
     since = datetime.utcnow() - timedelta(days=days)
 
-    # ค่าเฉลี่ยรวมทุก level
     overall = db.session.query(
         func.avg(TypingTestSession.wpm),
         func.avg(TypingTestSession.accuracy),
@@ -78,36 +71,31 @@ def my_summary():
         TypingTestSession.created_at >= since
     ).first()
 
-    avg_speed    = int(round(overall[0])) if overall and overall[0] is not None else 0
+    avg_speed = int(round(overall[0])) if overall and overall[0] is not None else 0
     avg_accuracy = int(round(overall[1])) if overall and overall[1] is not None else 0
 
-    # group by วัน + level
     day_col = func.date_trunc('day', TypingTestSession.created_at)
     rows = db.session.query(
         day_col.label("day"),
-        TypingTestSession.level,
         func.avg(TypingTestSession.wpm).label("avg_wpm"),
         func.avg(TypingTestSession.accuracy).label("avg_acc"),
     ).filter(
         TypingTestSession.user_id == uid,
         TypingTestSession.created_at >= since
-    ).group_by(
-        day_col,
-        TypingTestSession.level
-    ).order_by(day_col.asc()).all()
+    ).group_by(day_col).order_by(day_col.asc()).all()
 
     history = []
     for r in rows:
         d = r.day.date() if hasattr(r.day, "date") else r.day
+        label = d.strftime("%d/%m")
         history.append({
-            "date":           d.strftime("%d/%m"),
-            "level":          r.level,
+            "date": label,
             "ความเร็ว (wpm)": int(round(r.avg_wpm)) if r.avg_wpm is not None else 0,
             "ความแม่นยำ (%)": int(round(r.avg_acc)) if r.avg_acc is not None else 0,
         })
 
     return jsonify({
-        "avg_speed":    avg_speed,
+        "avg_speed": avg_speed,
         "avg_accuracy": avg_accuracy,
-        "history":      history,
+        "history": history,
     })
